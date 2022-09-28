@@ -58,4 +58,15 @@ public class EmployeePayrollService {
 			count = new EmployeePayrollFileIOService().countEntries();
 		return count;
 	}
+
+	public long readDataFromFile(IOService fileIo) {
+		long count = 0;
+		List<String> employees = new ArrayList<>();
+		if(fileIo.equals(IOService.FILE_IO)) {
+			employees = new EmployeePayrollFileIOService().readData();
+			System.out.println("Data read from file :\n" + employees);
+			count = employees.size();
+		}
+		return count;
+	}
 }
