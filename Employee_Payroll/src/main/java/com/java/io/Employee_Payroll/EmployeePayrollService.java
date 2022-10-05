@@ -75,4 +75,29 @@ public class EmployeePayrollService {
 			this.employeePayrollList = new EmployeePayrollDBService().readData();
 		return employeePayrollList;
 	}
+
+	public boolean checkEmployeePayrollInSyncWithDB(String name) {
+		List<EmployeePayrollData> employeePayrollList = (List<EmployeePayrollData>) new EmployeePayrollDBService().getSalary(name);
+		return employeePayrollList.get(0).equals(getEmployeePayrollData(name));
+	}
+
+	public void updateEmployeeSalary(String name, double salary) {
+		int result = new EmployeePayrollDBService().updateEmployeeData(name, salary);
+		if (result == 0) {
+			System.out.println("Database Update Failure!");
+		}
+		else {
+			EmployeePayrollData employeePayrollData = this.getEmployeePayrollData(name);
+			if (employeePayrollData != null)
+				employeePayrollData.salary = salary;
+		}
+			
+	}
+
+	private EmployeePayrollData getEmployeePayrollData(String name) {
+		return this.employeePayrollList.stream()
+				.filter(employeePayrollDataItem -> employeePayrollDataItem.name.equals(name))
+				.findFirst()
+				.orElse(null);
+	}
 }
