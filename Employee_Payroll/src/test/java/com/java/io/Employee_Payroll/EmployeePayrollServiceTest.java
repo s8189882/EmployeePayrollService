@@ -3,6 +3,7 @@ package com.java.io.Employee_Payroll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,9 +41,17 @@ class EmployeePayrollServiceTest {
 	
 	@Test
 	public void givenNewSalaryFor_Employee_WhenUpdated_ShouldSyncWithDB() {
-		List<EmployeePayrollData> employeePayrollData = employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
 		employeePayrollService.updateEmployeeSalary("Mark", 5000000.00);
 		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Mark");
 		assertTrue(result);
+	}
+	
+	@Test
+	public void givenDateRange_WhenRetrieved_ShouldMatchEmployeeCount() {
+		employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
+		LocalDate startDate = LocalDate.of(2019, 01, 01);
+		LocalDate endDate = LocalDate.now();
+		List<EmployeePayrollData> employeePayrollData = employeePayrollService.readEmployeePayrollDataForDateRange(IOService.DB_IO, startDate, endDate);
+		assertEquals(3, employeePayrollData.size());
 	}
 }
