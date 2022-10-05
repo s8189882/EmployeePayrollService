@@ -1,6 +1,7 @@
 package com.java.io.Employee_Payroll;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,9 +33,16 @@ class EmployeePayrollServiceTest {
 	}
 	
 	@Test
-	public void givenEmployeePayrollInDB_When_Retrieved_ShouldMatchEmployeeCount() {
+	public void givenEmployeePayrollInDB_WhenRetrieved_ShouldMatchEmployeeCount() {
 		List<EmployeePayrollData> employeePayrollData = employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
 		assertEquals(3, employeePayrollData.size());
-
+	}
+	
+	@Test
+	public void givenNewSalaryFor_Employee_WhenUpdated_ShouldSyncWithDB() {
+		List<EmployeePayrollData> employeePayrollData = employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
+		employeePayrollService.updateEmployeeSalary("Mark", 5000000.00);
+		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Mark");
+		assertTrue(result);
 	}
 }

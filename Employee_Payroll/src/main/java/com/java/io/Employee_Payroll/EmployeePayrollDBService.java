@@ -15,8 +15,7 @@ public class EmployeePayrollDBService {
 	public List<EmployeePayrollData> readData() {
 		String sql = "SELECT * FROM employee_payroll;";
 		List<EmployeePayrollData> employeePayrollList = new ArrayList<EmployeePayrollData>();
-		try {
-			Connection connection = this.getConnection();
+		try (Connection connection = this.getConnection()){
 			Statement statement = connection.createStatement();
 			ResultSet resultSet = statement.executeQuery(sql);
 			while (resultSet.next()) {
@@ -42,5 +41,26 @@ public class EmployeePayrollDBService {
 		connection = DriverManager.getConnection(jdbcURL, userName, password);
 		System.out.println("Connection is successful!!!\n" + connection);
 		return connection;
+	}
+
+	public int updateEmployeeData(String name, double salary) {
+		String sql = "update employee_payroll set salary " + salary + " where name = '" + name +"';";
+		try (Connection connection = this.getConnection()){
+			Statement statement = connection.createStatement();
+			return statement.executeUpdate(sql);
+		} catch (SQLException e) {
+			throw new IllegalStateException("Database Update Failure!");
+		}
+	}
+	
+	public ResultSet getSalary(String name) {
+		String sql = "select salary from employee_payroll where name = '" + name +"';";
+		try (Connection connection = this.getConnection()){
+			Statement statement = connection.createStatement();
+			ResultSet resultSet = statement.executeQuery(sql);
+			return resultSet;
+		} catch (SQLException e) {
+			throw new IllegalStateException("Database Update Failure!");
+		}
 	}
 }
