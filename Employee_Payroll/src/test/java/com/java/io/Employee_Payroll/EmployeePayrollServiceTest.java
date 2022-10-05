@@ -3,6 +3,8 @@ package com.java.io.Employee_Payroll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import com.java.io.Employee_Payroll.EmployeePayrollService.IOService;
 
@@ -27,5 +29,12 @@ class EmployeePayrollServiceTest {
 	public void test() {
 		long count = employeePayrollService.readDataFromFile(IOService.FILE_IO);
 		assertEquals(3, count);
+	}
+	
+	@Test
+	public void givenEmployeePayrollInDB_When_Retrieved_ShouldMatchEmployeeCount() {
+		List<EmployeePayrollData> employeePayrollData = employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
+		assertEquals(3, employeePayrollData.size());
+
 	}
 }
