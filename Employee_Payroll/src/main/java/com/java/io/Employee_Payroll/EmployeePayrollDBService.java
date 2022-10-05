@@ -2,6 +2,7 @@ package com.java.io.Employee_Payroll;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -11,6 +12,7 @@ import java.util.List;
 
 
 public class EmployeePayrollDBService {
+	private PreparedStatement employeePayrollDataStatement;
 
 	public List<EmployeePayrollData> readData() {
 		String sql = "SELECT * FROM employee_payroll;";
@@ -42,10 +44,10 @@ public class EmployeePayrollDBService {
 		System.out.println("Connection is successful!!!\n" + connection);
 		return connection;
 	}
-
-	public int updateEmployeeData(String name, double salary) {
-		String sql = "update employee_payroll set salary " + salary + " where name = '" + name +"';";
+	
+	public int preparedStatementForEmployeeData() {
 		try (Connection connection = this.getConnection()){
+			String sql = "SELECT * FROM employee_payroll WHERE name = ?";
 			Statement statement = connection.createStatement();
 			return statement.executeUpdate(sql);
 		} catch (SQLException e) {
@@ -53,14 +55,75 @@ public class EmployeePayrollDBService {
 		}
 	}
 	
-	public ResultSet getSalary(String name) {
-		String sql = "select salary from employee_payroll where name = '" + name +"';";
+	private List<EmployeePayrollData> getEmployeePayrollData(ResultSet resultSet) {
+		List<EmployeePayrollData> employeePayrollList = new ArrayList<EmployeePayrollData>();
+		try {
+			while (resultSet.next()) {
+			int id = resultSet.getInt("id");
+			String name = resultSet.getString("name");
+			double salary = resultSet.getDouble("salary");
+			LocalDate startDate = resultSet.getDate("start").toLocalDate();
+			employeePayrollList.add(new EmployeePayrollData(id, name, salary, startDate));
+			System.out.println(id + "\t" + name + "\t" + salary + "\t" + startDate);
+		}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return employeePayrollList;
+	}
+	
+	private List<EmployeePayrollData> getEmployeePayrollDataUsingDB(String sql) {
+		ResultSet resultSet;
+		List<EmployeePayrollData> employeePayrollList = null;
 		try (Connection connection = this.getConnection()){
 			Statement statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery(sql);
-			return resultSet;
+			resultSet = statement.executeQuery(sql);
+			employeePayrollList = this.getEmployeePayrollData(resultSet);
 		} catch (SQLException e) {
 			throw new IllegalStateException("Database Update Failure!");
 		}
+		return employeePayrollList;
+	}
+	
+	public List<EmployeePayrollData> getEmployeePayrollData(String name) {
+		List<EmployeePayrollData> employeePayrollList = null;
+		if (this.employeePayrollDataStatement == null)
+			this.preparedStatementForEmployeeData();
+		try {
+			employeePayrollDataStatement.setString(1, name);
+			ResultSet resultSet = employeePayrollDataStatement.executeQuery();
+			employeePayrollList = this.getEmployeePayrollData(resultSet);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return employeePayrollList;
+	}
+	
+	public int updateEmployeeData(String name, double salary) {
+		return this.updateEmployeeDataUsingPreparedStatement(name, salary);
+	}
+	
+	private int updateEmployeeDataUsingStatement(String name, double salary) {
+		String sql = String.format("update employee_payroll set salary = %.2f where name = '%s';", salary, name);
+		try (Connection connection = this.getConnection()){
+			Statement statement = connection.createStatement();
+			return statement.executeUpdate(sql);
+		} catch (SQLException e) {
+			throw new IllegalStateException("Database Update Failure!");
+		}
+//		return 0;
+	}
+	
+	public int updateEmployeeDataUsingPreparedStatement(String name, double salary) {
+		try (Connection connection = this.getConnection()){
+			String sql = "update employee_payroll set salary = ? where name = ?";
+			PreparedStatement preparedStatement = connection.prepareStatement(sql);
+			preparedStatement.setDouble(1, salary);
+			preparedStatement.setString(2, name);
+			return preparedStatement.executeUpdate(sql);
+		} catch (SQLException e) {
+			throw new IllegalStateException("Database Update Failure!");
+		}
+//		return 0;
 	}
 }

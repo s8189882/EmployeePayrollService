@@ -77,7 +77,7 @@ public class EmployeePayrollService {
 	}
 
 	public boolean checkEmployeePayrollInSyncWithDB(String name) {
-		List<EmployeePayrollData> employeePayrollList = (List<EmployeePayrollData>) new EmployeePayrollDBService().getSalary(name);
+		List<EmployeePayrollData> employeePayrollList = (List<EmployeePayrollData>) new EmployeePayrollDBService().getEmployeePayrollData(name);
 		return employeePayrollList.get(0).equals(getEmployeePayrollData(name));
 	}
 
