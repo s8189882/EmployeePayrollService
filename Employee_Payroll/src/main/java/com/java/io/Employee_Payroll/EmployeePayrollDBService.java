@@ -13,6 +13,11 @@ import java.util.List;
 
 public class EmployeePayrollDBService {
 	private PreparedStatement employeePayrollDataStatement;
+	private static EmployeePayrollDBService employeePayrollDBService;
+	
+	private EmployeePayrollDBService() {
+
+	}
 
 	public List<EmployeePayrollData> readData() {
 		String sql = "SELECT * FROM employee_payroll;";
@@ -111,7 +116,7 @@ public class EmployeePayrollDBService {
 		} catch (SQLException e) {
 			throw new IllegalStateException("Database Update Failure!");
 		}
-//		return 0;
+		//return 0;
 	}
 	
 	public int updateEmployeeDataUsingPreparedStatement(String name, double salary) {
@@ -124,6 +129,12 @@ public class EmployeePayrollDBService {
 		} catch (SQLException e) {
 			throw new IllegalStateException("Database Update Failure!");
 		}
-//		return 0;
+		//return 0;
+	}
+
+	public static EmployeePayrollDBService getInstance() {
+		if (employeePayrollDBService == null)
+			employeePayrollDBService = new EmployeePayrollDBService();
+		return employeePayrollDBService;
 	}
 }
