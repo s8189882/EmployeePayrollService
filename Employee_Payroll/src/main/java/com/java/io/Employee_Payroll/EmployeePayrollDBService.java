@@ -131,4 +131,10 @@ public class EmployeePayrollDBService {
 		}
 		//return 0;
 	}
+
+	public static EmployeePayrollDBService getInstance() {
+		if (employeePayrollDBService == null)
+			employeePayrollDBService = new EmployeePayrollDBService();
+		return employeePayrollDBService;
+	}
 }
