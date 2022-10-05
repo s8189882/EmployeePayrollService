@@ -1,6 +1,7 @@
 package com.java.io.Employee_Payroll;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -79,13 +80,13 @@ public class EmployeePayrollDBService {
 	
 	private List<EmployeePayrollData> getEmployeePayrollDataUsingDB(String sql) {
 		ResultSet resultSet;
-		List<EmployeePayrollData> employeePayrollList = null;
+		List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
 		try (Connection connection = this.getConnection()){
 			Statement statement = connection.createStatement();
 			resultSet = statement.executeQuery(sql);
 			employeePayrollList = this.getEmployeePayrollData(resultSet);
 		} catch (SQLException e) {
-			throw new IllegalStateException("Database Update Failure!");
+			e.printStackTrace();;
 		}
 		return employeePayrollList;
 	}
@@ -116,7 +117,7 @@ public class EmployeePayrollDBService {
 		} catch (SQLException e) {
 			throw new IllegalStateException("Database Update Failure!");
 		}
-		//return 0;
+		return 0;
 	}
 	
 	public int updateEmployeeDataUsingPreparedStatement(String name, double salary) {
@@ -129,12 +130,17 @@ public class EmployeePayrollDBService {
 		} catch (SQLException e) {
 			throw new IllegalStateException("Database Update Failure!");
 		}
-		//return 0;
+		return 0;
 	}
 
 	public static EmployeePayrollDBService getInstance() {
 		if (employeePayrollDBService == null)
 			employeePayrollDBService = new EmployeePayrollDBService();
 		return employeePayrollDBService;
+	}
+
+	public List<EmployeePayrollData> getEmployeePayrollDataForDateRange(LocalDate startDate, LocalDate endDate) {
+		String sql = String.format("SELECT * FROM employee_payroll WHERE start BETWEEN '%s' AND '%s';", Date.valueOf(startDate), Date.valueOf(endDate));
+		return this.getEmployeePayrollDataUsingDB(sql);
 	}
 }
