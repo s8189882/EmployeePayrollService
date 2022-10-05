@@ -12,12 +12,14 @@ public class EmployeePayrollService {
 	}
 	
 	private List<EmployeePayrollData> employeePayrollList;
+	private static EmployeePayrollDBService employeePayrollDBService;
 	
 	public EmployeePayrollService() {
-		
+		employeePayrollDBService = EmployeePayrollDBService.getInstance();
 	}
 	
 	public EmployeePayrollService(List<EmployeePayrollData> employeePayrollList) {
+		this();
 		this.employeePayrollList = employeePayrollList;
 	}
 
@@ -72,17 +74,17 @@ public class EmployeePayrollService {
 
 	public List<EmployeePayrollData> readEmployeePayrollData(IOService ioService) {
 		if (ioService.equals(IOService.DB_IO))
-			this.employeePayrollList = new EmployeePayrollDBService().readData();
+			this.employeePayrollList = employeePayrollDBService.readData();
 		return employeePayrollList;
 	}
 
 	public boolean checkEmployeePayrollInSyncWithDB(String name) {
-		List<EmployeePayrollData> employeePayrollList = (List<EmployeePayrollData>) new EmployeePayrollDBService().getEmployeePayrollData(name);
+		List<EmployeePayrollData> employeePayrollList = (List<EmployeePayrollData>) employeePayrollDBService.getEmployeePayrollData(name);
 		return employeePayrollList.get(0).equals(getEmployeePayrollData(name));
 	}
 
 	public void updateEmployeeSalary(String name, double salary) {
-		int result = new EmployeePayrollDBService().updateEmployeeData(name, salary);
+		int result = employeePayrollDBService.updateEmployeeData(name, salary);
 		if (result == 0) {
 			System.out.println("Database Update Failure!");
 		}
