@@ -188,8 +188,9 @@ public class EmployeePayrollDBService {
 		EmployeePayrollData employeePayrollData = null;
 		try {
 			connection = this.getConnection();
+			connection.setAutoCommit(false);
 		} catch (SQLException e1) {
-			e1.printStackTrace();
+			throw new IllegalStateException("\nCould not enable Auto Commit mode for DB connection!");
 		}
 		try (Statement statement = connection.createStatement()) {
 			String sql = String.format("INSERT INTO employee_payroll (name, gender, salary, start) VALUES ('%s', '%s', %s, '%s')", name, gender, salary, Date.valueOf(startDate));
@@ -201,6 +202,12 @@ public class EmployeePayrollDBService {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			try {
+				connection.rollback();
+				return employeePayrollData;
+			} catch (SQLException e1) {
+				throw new IllegalStateException("\nRollback Failure post query failure!");
+			}
 		}
 		try (Statement statement = connection.createStatement()) {
 			double deductions = salary * 0.2;
@@ -214,6 +221,27 @@ public class EmployeePayrollDBService {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			try {
+				connection.rollback();
+				return employeePayrollData;
+			} catch (SQLException e1) {
+				throw new IllegalStateException("\nRollback Failure post query failure!");
+			}
+			
+		} 
+		try {
+			connection.commit();
+		} catch (SQLException e) {
+			throw new IllegalStateException("\nTransaction Commit failure!");
+
+		}finally {
+		
+			if (connection != null)
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					throw new IllegalStateException("\nCould not close JDBC connection!");
+				}
 		}
 		return employeePayrollData;
 	}
