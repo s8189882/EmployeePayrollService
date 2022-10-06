@@ -70,4 +70,12 @@ class EmployeePayrollServiceTest {
 		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Melissa");
 		assertTrue(result);
 	}
+	
+	@Test
+	public void givenNewEmployee_WhenAdded_ShouldSyncWithDBInAllTables() {
+		employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
+		employeePayrollService.addEmployeeToPayrollToBothTables("John", 8326782.00, LocalDate.now(), "M");
+		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("John");
+		assertTrue(result);
+	}
 }
