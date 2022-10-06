@@ -121,4 +121,8 @@ public class EmployeePayrollService {
 	public void addEmployeeToPayroll(String name, double salary, LocalDate startDate, String gender) {
 		employeePayrollList.add(employeePayrollDBService.addEmployeeToPayroll(name, salary, startDate, gender));	
 	}
+	
+	public void addEmployeeToPayrollToBothTables(String name, double salary, LocalDate startDate, String gender) {
+		employeePayrollList.add(employeePayrollDBService.addEmployeeToPayrollToBothTables(name, salary, startDate, gender));	
+	}
 }
